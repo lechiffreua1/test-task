@@ -7,7 +7,7 @@ const port = 8080;
 const filePath = path.join(__dirname, '/tmp.txt');
 
 let server = http.createServer((req, res) => {
-  
+
     if (req.method === 'POST') {
       let body = '';
 
@@ -16,13 +16,11 @@ let server = http.createServer((req, res) => {
       });
 
       req.on('end', () => {
-
         fs.open(filePath, 'r', (err, fd) => {
 
           if (err && err.code === 'ENOENT') {
 
             fs.appendFile(filePath, body, (err) => {
-
               if (err) {
                 errorCb(res, 500);
               }
@@ -33,23 +31,26 @@ let server = http.createServer((req, res) => {
           } else {
 
             fs.readFile(filePath, 'utf8', (err, data) => {
-
               if (err) {
                 errorCb(res, 500);
               }
 
               fs.appendFile(filePath, body, (err) => {
-
                   if (err) {
                     errorCb(res, 500);
                   }
 
-                  let contentObj = {
-                      content: data
-                  };
+                  if (data) {
+                    let contentObj = {
+                        content: data
+                    };
 
-                  res.writeHead(200, {'Content-Type': 'application/json'});
-                  res.end(JSON.stringify(contentObj));
+                    res.writeHead(200, {'Content-Type': 'application/json'});
+                    res.end(JSON.stringify(contentObj));
+                  }
+
+                  res.writeHead(200);
+                  res.end();
               });
             });
           }
